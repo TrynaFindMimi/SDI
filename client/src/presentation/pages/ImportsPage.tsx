@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useImportStore } from '@application/state/importStore';
-import { Plus, Search, Eye, Trash2 } from 'lucide-react';
+import { Plus, Search, Eye, Trash2, Package } from 'lucide-react';
 import { ImportStatus } from '@domain/models';
 import { useAuthStore } from '@application/state/authStore';
-import '../styles/components.css';
+import '../../styles/components.css';
 
 export function ImportsPage() {
   const { imports, fetchAll, create, remove } = useImportStore();
@@ -46,26 +46,33 @@ export function ImportsPage() {
         </div>
         {canEdit && (
           <button className="glass-button" onClick={() => setShowModal(true)}>
-            <Plus size={16} /> Nueva Importación
+            <Plus size={18} /> Nueva Importación
           </button>
         )}
       </div>
 
-      <div className="glass-card" style={{ padding: '1rem', marginBottom: '1.5rem' }}>
+      <div className="glass-card" style={{ padding: '1rem', marginBottom: '2rem' }}>
         <div style={{ position: 'relative' }}>
-          <Search size={16} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-secondary)' }} />
+          <Search size={18} style={{ 
+            position: 'absolute', 
+            left: '1rem', 
+            top: '50%', 
+            transform: 'translateY(-50%)', 
+            color: 'var(--color-text-secondary)',
+            pointerEvents: 'none'
+          }} />
           <input
             type="text"
             placeholder="Buscar por número..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="glass-input"
-            style={{ paddingLeft: '2.5rem' }}
+            style={{ paddingLeft: '3rem' }}
           />
         </div>
       </div>
 
-      <div className="glass-card" style={{ padding: '1.5rem' }}>
+      <div className="glass-card" style={{ padding: '0' }}>
         <div className="table-container">
           <table className="glass-table">
             <thead>
@@ -80,7 +87,7 @@ export function ImportsPage() {
             <tbody>
               {filtered.map((imp) => (
                 <tr key={imp.id}>
-                  <td style={{ fontWeight: 500 }}>{imp.importNumber}</td>
+                  <td style={{ fontWeight: 600 }}>{imp.importNumber}</td>
                   <td>
                     <span className={`glass-badge badge-${imp.status}`}>
                       {imp.status === ImportStatus.DRAFT && 'Borrador'}
@@ -94,15 +101,17 @@ export function ImportsPage() {
                   <td>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                       <button
+                        className="icon-button"
                         onClick={() => navigate(`/imports/${imp.id}`)}
-                        style={{ background: 'none', color: 'var(--color-accent)', padding: '0.5rem' }}
+                        title="Ver detalles"
                       >
                         <Eye size={16} />
                       </button>
                       {canDelete && imp.status !== ImportStatus.CLOSED && (
                         <button
+                          className="icon-button danger"
                           onClick={() => handleDelete(imp.id)}
-                          style={{ background: 'none', color: 'var(--color-error)', padding: '0.5rem' }}
+                          title="Eliminar"
                         >
                           <Trash2 size={16} />
                         </button>
@@ -113,8 +122,18 @@ export function ImportsPage() {
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={5} style={{ textAlign: 'center', color: 'var(--color-text-secondary)', padding: '2rem' }}>
-                    No se encontraron importaciones
+                  <td colSpan={5} style={{ 
+                    textAlign: 'center', 
+                    color: 'var(--color-text-secondary)', 
+                    padding: '4rem 2rem'
+                  }}>
+                    <Package size={48} style={{ opacity: 0.3, marginBottom: '1rem' }} />
+                    <p style={{ fontSize: '1rem', fontWeight: 500 }}>
+                      {search ? 'No se encontraron resultados' : 'No hay importaciones registradas'}
+                    </p>
+                    <p style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>
+                      {search ? 'Intenta con otro término de búsqueda' : 'Crea tu primera importación para comenzar'}
+                    </p>
                   </td>
                 </tr>
               )}
@@ -126,12 +145,27 @@ export function ImportsPage() {
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem' }}>
+            <h2 style={{ 
+              fontSize: '1.5rem', 
+              fontWeight: 700, 
+              marginBottom: '2rem',
+              background: 'linear-gradient(135deg, #fafafa 0%, #c084fc 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}>
               Nueva Importación
             </h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginBottom: '0.5rem' }}>
+                <label style={{ 
+                  display: 'block', 
+                  fontSize: '0.75rem', 
+                  color: 'var(--color-text-secondary)', 
+                  marginBottom: '0.5rem',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
                   Número de Importación *
                 </label>
                 <input
@@ -144,7 +178,15 @@ export function ImportsPage() {
                 />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginBottom: '0.5rem' }}>
+                <label style={{ 
+                  display: 'block', 
+                  fontSize: '0.75rem', 
+                  color: 'var(--color-text-secondary)', 
+                  marginBottom: '0.5rem',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
                   Llegada Estimada
                 </label>
                 <input
@@ -154,11 +196,15 @@ export function ImportsPage() {
                   className="glass-input"
                 />
               </div>
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                <button className="glass-button" onClick={handleCreate}>
-                  Crear
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+                <button className="glass-button" onClick={handleCreate} style={{ flex: 1, justifyContent: 'center' }}>
+                  Crear Importación
                 </button>
-                <button className="glass-button glass-button-secondary" onClick={() => setShowModal(false)}>
+                <button 
+                  className="glass-button glass-button-secondary" 
+                  onClick={() => setShowModal(false)}
+                  style={{ flex: 1, justifyContent: 'center' }}
+                >
                   Cancelar
                 </button>
               </div>

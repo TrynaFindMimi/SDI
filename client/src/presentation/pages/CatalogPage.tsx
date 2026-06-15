@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 import { useCatalogStore } from '@application/state/catalogStore';
 import { useAuthStore } from '@application/state/authStore';
 import { Plus, Edit, Trash2, Package, Building2 } from 'lucide-react';
-import '../styles/components.css';
+import '../../styles/components.css';
 
 type CatalogTab = 'products' | 'suppliers';
 
 export function CatalogPage() {
   const { products, suppliers, fetchProducts, fetchSuppliers, deleteProduct, deleteSupplier } = useCatalogStore();
   const { user } = useAuthStore();
-  const [activeTab, setActiveTab] = useState<CatalogTab>('products');
+  const [activeTab, setTab] = useState<CatalogTab>('products');
 
   useEffect(() => {
     fetchProducts();
@@ -26,35 +26,35 @@ export function CatalogPage() {
         <p className="page-subtitle">Gestiona productos y proveedores</p>
       </div>
 
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem' }}>
+      <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2.5rem' }}>
         <button
-          className="glass-button"
-          style={{
-            background: activeTab === 'products' ? 'linear-gradient(135deg, var(--color-primary), var(--color-primary-light))' : 'rgba(255,255,255,0.05)',
-            border: activeTab === 'products' ? '1px solid rgba(255,255,255,0.1)' : '1px solid var(--glass-border)'
-          }}
-          onClick={() => setActiveTab('products')}
+          className={`tab-button ${activeTab === 'products' ? 'active' : ''}`}
+          onClick={() => setTab('products')}
         >
-          <Package size={16} /> Productos
+          <Package size={18} style={{ marginRight: '0.5rem' }} />
+          Productos
         </button>
         <button
-          className="glass-button"
-          style={{
-            background: activeTab === 'suppliers' ? 'linear-gradient(135deg, var(--color-primary), var(--color-primary-light))' : 'rgba(255,255,255,0.05)',
-            border: activeTab === 'suppliers' ? '1px solid rgba(255,255,255,0.1)' : '1px solid var(--glass-border)'
-          }}
-          onClick={() => setActiveTab('suppliers')}
+          className={`tab-button ${activeTab === 'suppliers' ? 'active' : ''}`}
+          onClick={() => setTab('suppliers')}
         >
-          <Building2 size={16} /> Proveedores
+          <Building2 size={18} style={{ marginRight: '0.5rem' }} />
+          Proveedores
         </button>
       </div>
 
       {activeTab === 'products' && (
-        <div className="glass-card" style={{ padding: '1.5rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <h2 style={{ fontSize: '1.125rem', fontWeight: 600 }}>Productos</h2>
+        <div className="glass-card" style={{ padding: '0' }}>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            padding: '1.5rem 2rem',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+          }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Productos</h2>
             {canEdit && (
-              <button className="glass-button"><Plus size={16} /> Nuevo Producto</button>
+              <button className="glass-button"><Plus size={18} /> Nuevo Producto</button>
             )}
           </div>
           <div className="table-container">
@@ -72,7 +72,7 @@ export function CatalogPage() {
               <tbody>
                 {products.map((p) => (
                   <tr key={p.id}>
-                    <td style={{ fontWeight: 500 }}>{p.sku}</td>
+                    <td style={{ fontWeight: 600 }}>{p.sku}</td>
                     <td>{p.name}</td>
                     <td>{p.category || '-'}</td>
                     <td>{p.referenceFobPrice ? `$${p.referenceFobPrice.toFixed(2)}` : '-'}</td>
@@ -81,14 +81,14 @@ export function CatalogPage() {
                       <td>
                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                           {canEdit && (
-                            <button style={{ background: 'none', color: 'var(--color-accent)', padding: '0.5rem' }}>
+                            <button className="icon-button">
                               <Edit size={16} />
                             </button>
                           )}
                           {canDelete && (
                             <button
                               onClick={() => { if (confirm('¿Eliminar?')) deleteProduct(p.id); }}
-                              style={{ background: 'none', color: 'var(--color-error)', padding: '0.5rem' }}
+                              className="icon-button danger"
                             >
                               <Trash2 size={16} />
                             </button>
@@ -100,8 +100,13 @@ export function CatalogPage() {
                 ))}
                 {products.length === 0 && (
                   <tr>
-                    <td colSpan={6} style={{ textAlign: 'center', color: 'var(--color-text-secondary)', padding: '2rem' }}>
-                      No hay productos en el catálogo
+                    <td colSpan={6} style={{ 
+                      textAlign: 'center', 
+                      color: 'var(--color-text-secondary)', 
+                      padding: '3rem 2rem'
+                    }}>
+                      <Package size={48} style={{ opacity: 0.3, marginBottom: '1rem' }} />
+                      <p>No hay productos en el catálogo</p>
                     </td>
                   </tr>
                 )}
@@ -112,11 +117,17 @@ export function CatalogPage() {
       )}
 
       {activeTab === 'suppliers' && (
-        <div className="glass-card" style={{ padding: '1.5rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <h2 style={{ fontSize: '1.125rem', fontWeight: 600 }}>Proveedores</h2>
+        <div className="glass-card" style={{ padding: '0' }}>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            padding: '1.5rem 2rem',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+          }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Proveedores</h2>
             {canEdit && (
-              <button className="glass-button"><Plus size={16} /> Nuevo Proveedor</button>
+              <button className="glass-button"><Plus size={18} /> Nuevo Proveedor</button>
             )}
           </div>
           <div className="table-container">
@@ -134,7 +145,7 @@ export function CatalogPage() {
               <tbody>
                 {suppliers.map((s) => (
                   <tr key={s.id}>
-                    <td style={{ fontWeight: 500 }}>{s.name}</td>
+                    <td style={{ fontWeight: 600 }}>{s.name}</td>
                     <td>{s.country}</td>
                     <td>{s.contactName || '-'}</td>
                     <td>{s.contactEmail || '-'}</td>
@@ -147,14 +158,14 @@ export function CatalogPage() {
                       <td>
                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                           {canEdit && (
-                            <button style={{ background: 'none', color: 'var(--color-accent)', padding: '0.5rem' }}>
+                            <button className="icon-button">
                               <Edit size={16} />
                             </button>
                           )}
                           {canDelete && (
                             <button
                               onClick={() => { if (confirm('¿Eliminar?')) deleteSupplier(s.id); }}
-                              style={{ background: 'none', color: 'var(--color-error)', padding: '0.5rem' }}
+                              className="icon-button danger"
                             >
                               <Trash2 size={16} />
                             </button>
@@ -166,8 +177,13 @@ export function CatalogPage() {
                 ))}
                 {suppliers.length === 0 && (
                   <tr>
-                    <td colSpan={6} style={{ textAlign: 'center', color: 'var(--color-text-secondary)', padding: '2rem' }}>
-                      No hay proveedores registrados
+                    <td colSpan={6} style={{ 
+                      textAlign: 'center', 
+                      color: 'var(--color-text-secondary)', 
+                      padding: '3rem 2rem'
+                    }}>
+                      <Building2 size={48} style={{ opacity: 0.3, marginBottom: '1rem' }} />
+                      <p>No hay proveedores registrados</p>
                     </td>
                   </tr>
                 )}
