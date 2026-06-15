@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sdi-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sdi_user
+      POSTGRES_PASSWORD: sdi_password
+      POSTGRES_DB: sdi_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sdi-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sdi_user -d sdi_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongodb:
+    image: mongo:7
+    container_name: sdi-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - sdi-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: sdi-server
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 4000
+      DATABASE_URL: postgresql://sdi_user:sdi_password@postgres:5432/sdi_db
+      MONGODB_URI: mongodb://mongodb:27017/sdi_db
+      JWT_SECRET: sdi-secret-key-change-in-production
+      JWT_EXPIRES_IN: 7d
+      FRONTEND_URL: http://localhost:3000
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./server/src:/app/src
+      - ./server/prisma:/app/prisma
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    networks:
+      - sdi-network
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: sdi-client
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - server
+    networks:
+      - sdi-network
+
+volumes:
+  postgres_data:
+  mongodb_data:
+
+networks:
+  sdi-network:
+    driver: bridge
