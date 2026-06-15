@@ -1,0 +1,161 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Import {
+  id                String   @id @default(uuid())
+  importNumber      String   @unique @map("import_number")
+  status            String   @default("draft")
+  startDate         DateTime @default(now()) @map("start_date")
+  estimatedArrival  DateTime? @map("estimated_arrival")
+  closeDate         DateTime? @map("close_date")
+  arrivalDate       DateTime? @map("arrival_date")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  logistics         LogisticsData?
+  importedProducts  ImportedProduct[]
+  costs             Cost[]
+
+  @@map("imports")
+}
+
+model LogisticsData {
+  id                 String   @id @default(uuid())
+  importId           String   @unique @map("import_id")
+  supplierId         String?  @map("supplier_id")
+  brokerName         String?  @map("broker_name")
+  brokerContact      String?  @map("broker_contact")
+  incoterm           String
+  originCountry      String?  @map("origin_country")
+  destinationCountry String   @default("México") @map("destination_country")
+  shippingMethod     String?  @map("shipping_method")
+  trackingNumber     String?  @map("tracking_number")
+  notes              String?
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  import             Import   @relation(fields: [importId], references: [id], onDelete: Cascade)
+  supplier           Supplier? @relation(fields: [supplierId], references: [id])
+
+  @@map("logistics_data")
+}
+
+model Supplier {
+  id            String   @id @default(uuid())
+  name          String
+  country       String
+  contactName   String?  @map("contact_name")
+  contactEmail  String?  @map("contact_email")
+  contactPhone  String?  @map("contact_phone")
+  address       String?
+  taxId         String?  @map("tax_id")
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  logistics     LogisticsData[]
+
+  @@map("suppliers")
+}
+
+model ProductCatalog {
+  id                 String   @id @default(uuid())
+  sku                String   @unique
+  name               String
+  category           String?
+  description        String?
+  referenceFobPrice  Decimal? @map("reference_fob_price")
+  unitOfMeasure      String   @default("pieza") @map("unit_of_measure")
+  isActive           Boolean  @default(true) @map("is_active")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  importedProducts   ImportedProduct[]
+
+  @@map("product_catalog")
+}
+
+model ImportedProduct {
+  id               String   @id @default(uuid())
+  importId         String   @map("import_id")
+  catalogProductId String?  @map("catalog_product_id")
+  sku              String
+  name             String
+  quantity         Int
+  fobPrice         Decimal  @map("fob_price")
+  expectedMargin   Decimal  @default(0) @map("expected_margin")
+  notes            String?
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  import           Import   @relation(fields: [importId], references: [id], onDelete: Cascade)
+  catalogProduct   ProductCatalog? @relation(fields: [catalogProductId], references: [id])
+  costAllocations  CostAllocation[]
+
+  @@map("imported_products")
+}
+
+model Cost {
+  id            String   @id @default(uuid())
+  importId      String   @map("import_id")
+  concept       String
+  category      String
+  amount        Decimal
+  currency      String   @default("USD")
+  description   String?
+  isAllocated   Boolean  @default(false) @map("is_allocated")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  import        Import   @relation(fields: [importId], references: [id], onDelete: Cascade)
+  allocations   CostAllocation[]
+
+  @@map("costs")
+}
+
+model CostAllocation {
+  id                String   @id @default(uuid())
+  costId            String   @map("cost_id")
+  importedProductId String   @map("imported_product_id")
+  allocatedAmount   Decimal  @map("allocated_amount")
+  allocationMethod  String   @default("proportional") @map("allocation_method")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  cost              Cost     @relation(fields: [costId], references: [id], onDelete: Cascade)
+  importedProduct   ImportedProduct @relation(fields: [importedProductId], references: [id], onDelete: Cascade)
+
+  @@map("cost_allocations")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String    @map("password_hash")
+  name          String
+  role          String    @default("reader")
+  isActive      Boolean   @default(true) @map("is_active")
+  lastLogin     DateTime? @map("last_login")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Permission {
+  id          String  @id @default(uuid())
+  role        String
+  resource    String
+  canCreate   Boolean @default(false) @map("can_create")
+  canRead     Boolean @default(true) @map("can_read")
+  canUpdate   Boolean @default(false) @map("can_update")
+  canDelete   Boolean @default(false) @map("can_delete")
+
+  @@unique([role, resource])
+  @@map("permissions")
+}
