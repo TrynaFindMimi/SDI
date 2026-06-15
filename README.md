@@ -14,6 +14,15 @@ Sistema web para la gestión integral de operaciones de importación, con seguim
 - Sistema de usuarios con roles
 - Generación de reportes imprimibles
 
+## Cuenta de Administrador (Demo)
+
+| Campo       | Valor            |
+|-------------|------------------|
+| **Email**   | admin@sdi.com    |
+| **Contraseña** | admin123      |
+
+> Esta cuenta tiene permisos de **Administrador** (acceso total al sistema).
+
 ## Stack Tecnológico
 
 ### Backend
@@ -124,13 +133,13 @@ docker-compose up --build server
 **PostgreSQL:**
 
 ```bash
-# Crear base de datos y usuario
-psql -U postgres
-
-CREATE USER sdi_user WITH PASSWORD 'sdi_password';
-CREATE DATABASE sdi_db OWNER sdi_user;
-GRANT ALL PRIVILEGES ON DATABASE sdi_db TO sdi_user;
-\q
+# Crear usuario, bases de datos y permisos
+psql -U postgres -c "CREATE USER sdi_user WITH PASSWORD 'sdi_password';"
+psql -U postgres -c "CREATE DATABASE sdi_db OWNER sdi_user;"
+psql -U postgres -c "CREATE DATABASE sdi_db_shadow OWNER sdi_user;"
+psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE sdi_db TO sdi_user;"
+psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE sdi_db_shadow TO sdi_user;"
+psql -U postgres -c "ALTER USER sdi_user CREATEDB;"
 ```
 
 **MongoDB:**

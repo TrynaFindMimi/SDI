@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 export async function connectMongoDB(): Promise<void> {
   try {
-    const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/sdi_db';
+    const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/cdi_db';
     await mongoose.connect(uri);
     console.log('✅ MongoDB connected');
   } catch (error) {
