@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@application/state/authStore';
 import { authService } from '@infrastructure/api/authService';
-import { User, UserRole } from '@domain/models';
+import { User } from '@domain/models';
 import { Plus, Edit, Trash2, Shield } from 'lucide-react';
 import '../styles/components.css';
 

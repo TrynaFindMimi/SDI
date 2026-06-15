@@ -14,7 +14,15 @@ export class SupplierUseCases {
   }
 
   async create(data: CreateSupplierInput): Promise<Supplier> {
-    const supplier = Supplier.create(data);
+    const supplier = Supplier.create({
+      name: data.name,
+      country: data.country,
+      contactName: data.contactName ?? null,
+      contactEmail: data.contactEmail ?? null,
+      contactPhone: data.contactPhone ?? null,
+      address: data.address ?? null,
+      taxId: data.taxId ?? null
+    });
     return this.supplierRepository.create(supplier);
   }
 

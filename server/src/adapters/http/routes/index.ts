@@ -1,21 +1,21 @@
 import { Router } from 'express';
-import { PrismaImportRepository } from '../../infrastructure/persistence/postgres/PrismaImportRepository';
-import { PrismaLogisticsRepository } from '../../infrastructure/persistence/postgres/PrismaLogisticsRepository';
-import { PrismaSupplierRepository } from '../../infrastructure/persistence/postgres/PrismaSupplierRepository';
-import { PrismaProductCatalogRepository } from '../../infrastructure/persistence/postgres/PrismaProductCatalogRepository';
-import { PrismaImportedProductRepository } from '../../infrastructure/persistence/postgres/PrismaImportedProductRepository';
-import { PrismaCostRepository } from '../../infrastructure/persistence/postgres/PrismaCostRepository';
-import { PrismaCostAllocationRepository } from '../../infrastructure/persistence/postgres/PrismaCostAllocationRepository';
-import { PrismaUserRepository } from '../../infrastructure/persistence/postgres/PrismaUserRepository';
-import { ImportUseCases, ProductUseCases, CostUseCases, FinancialUseCases, AuthUseCases, SupplierUseCases, CatalogUseCases } from '../../application/use-cases';
-import { ImportController } from './controllers/ImportController';
-import { ProductController } from './controllers/ProductController';
-import { CostController } from './controllers/CostController';
-import { FinancialController } from './controllers/FinancialController';
-import { AuthController } from './controllers/AuthController';
-import { SupplierController } from './controllers/SupplierController';
-import { CatalogController } from './controllers/CatalogController';
-import { authMiddleware, requireRole } from './middleware/auth';
+import { PrismaImportRepository } from '../../../infrastructure/persistence/postgres/PrismaImportRepository';
+import { PrismaLogisticsRepository } from '../../../infrastructure/persistence/postgres/PrismaLogisticsRepository';
+import { PrismaSupplierRepository } from '../../../infrastructure/persistence/postgres/PrismaSupplierRepository';
+import { PrismaProductCatalogRepository } from '../../../infrastructure/persistence/postgres/PrismaProductCatalogRepository';
+import { PrismaImportedProductRepository } from '../../../infrastructure/persistence/postgres/PrismaImportedProductRepository';
+import { PrismaCostRepository } from '../../../infrastructure/persistence/postgres/PrismaCostRepository';
+import { PrismaCostAllocationRepository } from '../../../infrastructure/persistence/postgres/PrismaCostAllocationRepository';
+import { PrismaUserRepository } from '../../../infrastructure/persistence/postgres/PrismaUserRepository';
+import { ImportUseCases, ProductUseCases, CostUseCases, FinancialUseCases, AuthUseCases, SupplierUseCases, CatalogUseCases } from '../../../application/use-cases';
+import { ImportController } from '../controllers/ImportController';
+import { ProductController } from '../controllers/ProductController';
+import { CostController } from '../controllers/CostController';
+import { FinancialController } from '../controllers/FinancialController';
+import { AuthController } from '../controllers/AuthController';
+import { SupplierController } from '../controllers/SupplierController';
+import { CatalogController } from '../controllers/CatalogController';
+import { authMiddleware, requireRole } from '../middleware/auth';
 
 const router = Router();
 

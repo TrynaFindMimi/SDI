@@ -23,7 +23,7 @@ export class ImportUseCases {
       importNumber: data.importNumber,
       startDate: new Date(),
       estimatedArrival: data.estimatedArrival ? new Date(data.estimatedArrival) : null
-    });
+    } as any);
 
     return this.importRepository.create(importEntity);
   }

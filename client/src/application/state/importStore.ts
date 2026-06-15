@@ -16,7 +16,7 @@ interface ImportState {
   clearError: () => void;
 }
 
-export const useImportStore = create<ImportState>((set, get) => ({
+export const useImportStore = create<ImportState>((set) => ({
   imports: [],
   currentImport: null,
   isLoading: false,

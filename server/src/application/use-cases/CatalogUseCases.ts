@@ -19,7 +19,14 @@ export class CatalogUseCases {
       throw new Error(`Ya existe un producto con SKU ${data.sku}`);
     }
 
-    const product = ProductCatalog.create(data);
+    const product = ProductCatalog.create({
+      sku: data.sku,
+      name: data.name,
+      category: data.category ?? null,
+      description: data.description ?? null,
+      referenceFobPrice: data.referenceFobPrice ?? null,
+      unitOfMeasure: data.unitOfMeasure || 'pieza'
+    });
     return this.catalogRepository.create(product);
   }
 

@@ -33,7 +33,7 @@ export class ProductUseCases {
       fobPrice: data.fobPrice,
       expectedMargin: data.expectedMargin || 0,
       notes: data.notes || null
-    });
+    } as any);
 
     return this.importedProductRepository.create(product);
   }

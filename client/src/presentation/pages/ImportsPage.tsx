@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useImportStore } from '@application/state/importStore';
-import { Plus, Search, Eye, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, Eye, Trash2 } from 'lucide-react';
 import { ImportStatus } from '@domain/models';
 import { useAuthStore } from '@application/state/authStore';
 import '../styles/components.css';

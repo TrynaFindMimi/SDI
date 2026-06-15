@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { IApiClient } from '@domain/interfaces';
 
-const BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
+const BASE_URL = '/api/v1';
 
 class AxiosApiClient implements IApiClient {
   private client: AxiosInstance;
