@@ -1,14 +1,16 @@
-FROM node:20-alpine
+FROM node:20-slim
 
 WORKDIR /app
 
-COPY package.json ./
+RUN apt-get update -y && apt-get install -y openssl
+
+COPY package.json package-lock.json ./
 RUN npm install
 
 COPY . .
 
-RUN npx prisma generate
+RUN npx prisma generate && npm run build
 
 EXPOSE 4000
 
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]
