@@ -11,7 +11,10 @@ function getMongoUri(): string {
   });
 
   if (process.env.MONGODB_URI) return process.env.MONGODB_URI;
-  if (process.env.MONGO_URL) return process.env.MONGO_URL;
+  if (process.env.MONGO_URL) {
+    console.log('📝 MONGO_URL value:', JSON.stringify(process.env.MONGO_URL));
+    return process.env.MONGO_URL;
+  }
 
   const host = process.env.MONGOHOST || 'localhost';
   const port = process.env.MONGOPORT || '27017';
