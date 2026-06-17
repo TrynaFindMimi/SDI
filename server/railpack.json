@@ -1,0 +1,7 @@
+{
+  "$schema": "https://schema.railpack.com",
+  "deploy": {
+    "startCommand": "npm run start",
+    "aptPackages": ["openssl"]
+  }
+}
