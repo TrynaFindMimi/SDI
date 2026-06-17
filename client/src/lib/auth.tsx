@@ -3,38 +3,61 @@ import type { User } from './types';
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string) => void;
+  token: string | null;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const DEMO_USERS: User[] = [
-  { id: '0', name: 'Admin Genérico', email: 'admin@admin.com', role: 'admin', createdAt: new Date().toISOString() },
-  { id: '1', name: 'Admin Demo', email: 'admin@logicost.com', role: 'admin', createdAt: new Date().toISOString() },
-  { id: '2', name: 'Usuario Demo', email: 'user@logicost.com', role: 'user', createdAt: new Date().toISOString() },
-];
+const API = '/api/v1';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    const stored = localStorage.getItem('logicost-user');
-    return stored ? JSON.parse(stored) : null;
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(() => {
+    return localStorage.getItem('logicost-token');
   });
 
-  const login = (email: string) => {
-    const found = DEMO_USERS.find(u => u.email === email) || DEMO_USERS[0];
-    setUser(found);
-    localStorage.setItem('logicost-user', JSON.stringify(found));
+  const login = async (email: string, password: string) => {
+    const res = await fetch(`${API}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error?.message || 'Credenciales inválidas');
+    }
+
+    const data = await res.json();
+    const serverUser = data.data.user || data.data;
+    const tokenStr = data.data.token;
+
+    const mappedUser: User = {
+      id: serverUser.id,
+      name: serverUser.name,
+      email: serverUser.email,
+      role: serverUser.role === 'admin' ? 'admin' : 'user',
+      createdAt: serverUser.createdAt || new Date().toISOString()
+    };
+
+    setUser(mappedUser);
+    setToken(tokenStr);
+    localStorage.setItem('logicost-user', JSON.stringify(mappedUser));
+    localStorage.setItem('logicost-token', tokenStr);
   };
 
   const logout = () => {
     setUser(null);
+    setToken(null);
     localStorage.removeItem('logicost-user');
+    localStorage.removeItem('logicost-token');
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAdmin: user?.role === 'admin' }}>
+    <AuthContext.Provider value={{ user, token, login, logout, isAdmin: user?.role === 'admin' }}>
       {children}
     </AuthContext.Provider>
   );

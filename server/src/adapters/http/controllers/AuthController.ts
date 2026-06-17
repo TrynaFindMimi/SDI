@@ -62,4 +62,31 @@ export class AuthController {
       res.status(400).json({ success: false, error: { message: error.message } });
     }
   };
+
+  register = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const user = await this.authUseCases.register(req.body);
+      res.status(201).json({ success: true, data: user, message: 'Solicitud enviada. Espera la aprobación del administrador.' });
+    } catch (error: any) {
+      res.status(400).json({ success: false, error: { message: error.message } });
+    }
+  };
+
+  approveUser = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const user = await this.authUseCases.approveUser(req.params.id, req.userId!);
+      res.json({ success: true, data: user });
+    } catch (error: any) {
+      res.status(400).json({ success: false, error: { message: error.message } });
+    }
+  };
+
+  rejectUser = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const user = await this.authUseCases.rejectUser(req.params.id, req.userId!);
+      res.json({ success: true, data: user });
+    } catch (error: any) {
+      res.status(400).json({ success: false, error: { message: error.message } });
+    }
+  };
 }

@@ -139,8 +139,11 @@ model User {
   email         String    @unique
   passwordHash  String    @map("password_hash")
   name          String
-  role          String    @default("reader")
+  role          String    @default("analista")
+  status        String    @default("pending")
   isActive      Boolean   @default(true) @map("is_active")
+  approvedBy    String?   @map("approved_by")
+  approvedAt    DateTime? @map("approved_at")
   lastLogin     DateTime? @map("last_login")
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")

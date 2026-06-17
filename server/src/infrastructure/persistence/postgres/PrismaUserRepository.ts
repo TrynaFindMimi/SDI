@@ -1,5 +1,6 @@
 import prisma from '../../config/postgres';
 import { User, UserRole } from '../../../domain/entities';
+import type { UserStatus } from '../../../domain/entities';
 import { IUserRepository } from '../../../domain/repositories';
 
 export class PrismaUserRepository implements IUserRepository {
@@ -20,6 +21,14 @@ export class PrismaUserRepository implements IUserRepository {
     return record ? this.toDomain(record) : null;
   }
 
+  async findByStatus(status: UserStatus): Promise<User[]> {
+    const records = await prisma.user.findMany({
+      where: { status },
+      orderBy: { createdAt: 'desc' }
+    });
+    return records.map(this.toDomain);
+  }
+
   async create(user: User): Promise<User> {
     const created = await prisma.user.create({
       data: {
@@ -28,7 +37,10 @@ export class PrismaUserRepository implements IUserRepository {
         passwordHash: user.passwordHash,
         name: user.name,
         role: user.role,
+        status: user.status,
         isActive: user.isActive,
+        approvedBy: user.approvedBy,
+        approvedAt: user.approvedAt,
         lastLogin: user.lastLogin
       }
     });
@@ -43,7 +55,10 @@ export class PrismaUserRepository implements IUserRepository {
         passwordHash: user.passwordHash,
         name: user.name,
         role: user.role,
+        status: user.status,
         isActive: user.isActive,
+        approvedBy: user.approvedBy,
+        approvedAt: user.approvedAt,
         lastLogin: user.lastLogin,
         updatedAt: user.updatedAt
       }
@@ -62,7 +77,10 @@ export class PrismaUserRepository implements IUserRepository {
       record.passwordHash,
       record.name,
       record.role as UserRole,
+      record.status as UserStatus,
       record.isActive,
+      record.approvedBy ?? null,
+      record.approvedAt ?? null,
       record.lastLogin,
       record.createdAt,
       record.updatedAt

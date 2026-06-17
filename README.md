@@ -14,14 +14,19 @@ Sistema web para la gestión integral de operaciones de importación, con seguim
 - Sistema de usuarios con roles
 - Generación de reportes imprimibles
 
-## Cuenta de Administrador (Demo)
+## Credenciales de Prueba (Desarrollo)
 
-| Campo       | Valor            |
-|-------------|------------------|
-| **Email**   | admin@sdi.com    |
-| **Contraseña** | admin123      |
+Las siguientes cuentas son creadas automáticamente al ejecutar el seed:
 
-> Esta cuenta tiene permisos de **Administrador** (acceso total al sistema).
+| Email | Contraseña | Rol |
+|-------|-----------|-----|
+| `admin@admin.com` | `12345` | Administrador |
+| `admin@cdi.com` | `admin123` | Administrador |
+| `supervisor@cdi.com` | `admin123` | Supervisor |
+| `operator@cdi.com` | `admin123` | Operador |
+| `reader@cdi.com` | `admin123` | Lector |
+
+Para crear el usuario admin inicial manualmente, ejecuta `npm run seed` dentro del contenedor del servidor.
 
 ## Stack Tecnológico
 
@@ -225,44 +230,22 @@ VITE_API_URL=/api/v1
 
 ## Primeros Pasos
 
-### 1. Crear Usuario Administrador
+### 1. Población de Datos Iniciales
 
-Después de levantar el sistema, necesitas crear un usuario admin:
+Después de las migraciones, ejecuta el seed para crear usuarios y permisos de prueba:
 
 ```bash
 # Con Docker
-docker-compose exec server node -e "
-const bcrypt = require('bcryptjs');
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+docker-compose exec server npx prisma db seed
 
-async function createAdmin() {
-  const passwordHash = await bcrypt.hash('admin123', 10);
-  await prisma.user.create({
-    data: {
-      email: 'admin@sdi.com',
-      passwordHash,
-      name: 'Administrador',
-      role: 'admin'
-    }
-  });
-  console.log('✅ Usuario admin creado: admin@sdi.com / admin123');
-  await prisma.\$disconnect();
-}
-
-createAdmin();
-"
-
-# Sin Docker (en carpeta server/)
-node -e "..." # mismo código
+# Sin Docker
+cd server && npm run seed
 ```
 
 ### 2. Acceder al Sistema
 
 1. Abre http://localhost:3000
-2. Inicia sesión con:
-   - **Email:** admin@sdi.com
-   - **Contraseña:** admin123
+2. Inicia sesión con alguna de las cuentas de prueba (ver tabla arriba)
 
 ### 3. Crear tu Primera Importación
 
@@ -413,17 +396,4 @@ Si encuentras problemas:
 3. Verifica que todos los servicios estén corriendo: `docker-compose ps`
 4. Asegúrate de que los puertos no estén en uso
 
-## Roles de Usuario
 
-- **Administrador**: Acceso total, gestión de usuarios
-- **Supervisor**: Puede crear, editar y eliminar
-- **Operador**: Puede crear y editar
-- **Lector**: Solo lectura
-
-## Documentación
-
-Ver carpeta `docs/` para:
-- Arquitectura del sistema
-- Modelo de datos
-- API endpoints
-- Guías de desarrollo

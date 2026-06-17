@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { seedData } from '../lib/seed';
 import { Lock, Mail, Eye, EyeOff, Ship, ArrowRight } from 'lucide-react';
@@ -20,14 +20,19 @@ export function LoginPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    await new Promise(r => setTimeout(r, 400));
     if (!email.includes('@')) {
       setError('Ingresa un email válido');
       setLoading(false);
       return;
     }
-    login(email);
-    navigate('/');
+    try {
+      await login(email, password);
+      navigate('/');
+    } catch (err: any) {
+      setError(err.message || 'Error de conexión con el servidor');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -101,12 +106,13 @@ export function LoginPage() {
             </Button>
           </form>
 
-          <div className="text-center border-t border-border/40 pt-5 space-y-2">
-            <p className="font-semibold text-foreground/75 uppercase tracking-wider text-[11px]">Credenciales de prueba</p>
-            <p className="text-sm"><span className="text-foreground/65 font-medium">admin@admin.com</span> / 12345</p>
-            <p className="text-sm"><span className="text-foreground/65 font-medium">admin@logicost.com</span> — Admin</p>
-            <p className="text-sm"><span className="text-foreground/65 font-medium">user@logicost.com</span> — Usuario</p>
-            <p className="text-xs text-muted-foreground/40">(cualquier contraseña funciona)</p>
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground/70">
+              ¿No tienes cuenta?{' '}
+              <Link to="/register" className="text-primary font-medium hover:underline">
+                Solicitar acceso
+              </Link>
+            </p>
           </div>
         </div>
       </div>

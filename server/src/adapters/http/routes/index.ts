@@ -46,12 +46,15 @@ const catalogController = new CatalogController(catalogUseCases);
 
 // Auth
 router.post('/auth/login', authController.login);
+router.post('/auth/register', authController.register);
 router.get('/auth/me', authMiddleware, authController.me);
 
 // Users (admin only)
 router.get('/users', authMiddleware, requireRole('admin'), authController.getAll);
 router.post('/users', authMiddleware, requireRole('admin'), authController.create);
 router.put('/users/:id', authMiddleware, requireRole('admin'), authController.update);
+router.patch('/users/:id/approve', authMiddleware, requireRole('admin'), authController.approveUser);
+router.patch('/users/:id/reject', authMiddleware, requireRole('admin'), authController.rejectUser);
 router.delete('/users/:id', authMiddleware, requireRole('admin'), authController.delete);
 
 // Imports

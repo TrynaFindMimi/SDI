@@ -6,3 +6,4 @@ export { ImportedProduct } from './ImportedProduct';
 export { Cost, CostCategory } from './Cost';
 export { CostAllocation } from './CostAllocation';
 export { User, UserRole } from './User';
+export type { UserStatus } from './User';

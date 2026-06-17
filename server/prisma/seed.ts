@@ -17,6 +17,7 @@ async function main() {
       passwordHash: genericAdminPasswordHash,
       name: 'Admin Genérico',
       role: 'admin',
+      status: 'approved',
       isActive: true
     }
   });
@@ -31,6 +32,7 @@ async function main() {
       passwordHash,
       name: 'Administrador',
       role: 'admin',
+      status: 'approved',
       isActive: true
     }
   });
@@ -45,6 +47,7 @@ async function main() {
       passwordHash,
       name: 'Supervisor Demo',
       role: 'supervisor',
+      status: 'approved',
       isActive: true
     }
   });
@@ -59,6 +62,7 @@ async function main() {
       passwordHash,
       name: 'Operador Demo',
       role: 'operator',
+      status: 'approved',
       isActive: true
     }
   });
@@ -73,6 +77,7 @@ async function main() {
       passwordHash,
       name: 'Lector Demo',
       role: 'reader',
+      status: 'approved',
       isActive: true
     }
   });

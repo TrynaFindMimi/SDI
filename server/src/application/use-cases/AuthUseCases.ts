@@ -1,8 +1,8 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { IUserRepository } from '../../domain/repositories';
-import { User, UserRole } from '../../domain/entities';
-import { CreateUserInput, LoginInput, UpdateUserInput } from '../dtos';
+import { User, UserRole, UserStatus } from '../../domain/entities';
+import { CreateUserInput, LoginInput, RegisterInput, UpdateUserInput } from '../dtos';
 
 export class AuthUseCases {
   constructor(private userRepository: IUserRepository) {}
@@ -15,6 +15,14 @@ export class AuthUseCases {
 
     if (!user.isActive) {
       throw new Error('Usuario desactivado');
+    }
+
+    if (user.status === 'pending') {
+      throw new Error('Tu cuenta está pendiente de aprobación por un administrador');
+    }
+
+    if (user.status === 'rejected') {
+      throw new Error('Tu solicitud de cuenta ha sido rechazada');
     }
 
     const isValid = await bcrypt.compare(data.password, user.passwordHash);
@@ -33,6 +41,68 @@ export class AuthUseCases {
 
     const { passwordHash, ...userWithoutPassword } = user;
     return { token, user: userWithoutPassword };
+  }
+
+  async register(data: RegisterInput): Promise<Omit<User, 'passwordHash'>> {
+    const existing = await this.userRepository.findByEmail(data.email);
+    if (existing) {
+      throw new Error('Ya existe un usuario con ese email');
+    }
+
+    const passwordHash = await bcrypt.hash(data.password, 10);
+    const user = User.create({
+      email: data.email,
+      passwordHash,
+      name: data.name,
+      role: data.role as UserRole,
+      status: 'pending'
+    });
+
+    const created = await this.userRepository.create(user);
+    const { passwordHash: _, ...userWithoutPassword } = created;
+    return userWithoutPassword;
+  }
+
+  async approveUser(id: string, approvedById: string): Promise<Omit<User, 'passwordHash'>> {
+    const user = await this.userRepository.findById(id);
+    if (!user) {
+      throw new Error('Usuario no encontrado');
+    }
+
+    if (user.status !== 'pending') {
+      throw new Error('El usuario no está pendiente de aprobación');
+    }
+
+    user.status = 'approved';
+    user.isActive = true;
+    user.approvedBy = approvedById;
+    user.approvedAt = new Date();
+    user.updatedAt = new Date();
+
+    const updated = await this.userRepository.update(user);
+    const { passwordHash, ...rest } = updated;
+    return rest;
+  }
+
+  async rejectUser(id: string, approvedById: string): Promise<Omit<User, 'passwordHash'>> {
+    const user = await this.userRepository.findById(id);
+    if (!user) {
+      throw new Error('Usuario no encontrado');
+    }
+
+    if (user.status !== 'pending') {
+      throw new Error('El usuario no está pendiente de aprobación');
+    }
+
+    user.status = 'rejected';
+    user.isActive = false;
+    user.approvedBy = approvedById;
+    user.approvedAt = new Date();
+    user.updatedAt = new Date();
+
+    const updated = await this.userRepository.update(user);
+    const { passwordHash, ...rest } = updated;
+    return rest;
   }
 
   async validateToken(token: string): Promise<User | null> {
@@ -55,7 +125,7 @@ export class AuthUseCases {
       email: data.email,
       passwordHash,
       name: data.name,
-      role: (data.role as UserRole) || UserRole.READER
+      role: (data.role as UserRole) || UserRole.ANALISTA
     });
 
     const created = await this.userRepository.create(user);

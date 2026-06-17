@@ -164,7 +164,7 @@ export function Dialog({ open, onClose, children }: { open: boolean; onClose: ()
 }
 
 /* ── AlertDialog ── */
-export function AlertDialog({ open, onClose, onConfirm, title, description }: { open: boolean; onClose: () => void; onConfirm: () => void; title: string; description: string }) {
+export function AlertDialog({ open, onClose, onConfirm, title, description, confirmText, confirmVariant }: { open: boolean; onClose: () => void; onConfirm: () => void; title: string; description: string; confirmText?: string; confirmVariant?: 'destructive' | 'success' | 'default' }) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -174,7 +174,7 @@ export function AlertDialog({ open, onClose, onConfirm, title, description }: { 
         <p className="mt-2.5 text-sm text-foreground/75">{description}</p>
         <div className="mt-6 flex justify-end gap-3">
           <Button variant="outline" onClick={onClose}>Cancelar</Button>
-          <Button variant="destructive" onClick={() => { onConfirm(); onClose(); }}>Continuar</Button>
+          <Button variant={confirmVariant || 'destructive'} onClick={() => { onConfirm(); onClose(); }}>{confirmText || 'Continuar'}</Button>
         </div>
       </div>
     </div>
