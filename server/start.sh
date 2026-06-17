@@ -1,2 +1,2 @@
 #!/bin/sh
-npm run start
+npx prisma generate && npx prisma db push && npm run start
