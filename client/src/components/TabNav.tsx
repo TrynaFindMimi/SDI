@@ -1,4 +1,4 @@
-import { FolderOpen, FileText, Package, DollarSign, BarChart3, BookOpen, TrendingUp, Clock, Printer, Users } from 'lucide-react';
+import { FolderOpen, FileText, Package, DollarSign, BarChart3, BookOpen, TrendingUp, Clock, Printer, Users, UserCircle } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 const TABS = [
@@ -12,6 +12,7 @@ const TABS = [
   { id: 'timeline', label: 'Línea de Tiempo', icon: Clock },
   { id: 'print', label: 'Imprimir', icon: Printer },
   { id: 'users', label: 'Usuarios', icon: Users },
+  { id: 'profile', label: 'Perfil', icon: UserCircle },
 ];
 
 export function TabNav({

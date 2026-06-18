@@ -4,95 +4,66 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Iniciando seed...');
+  console.log('🗑️  Vaciando base de datos...');
 
-  const genericAdminPasswordHash = await bcrypt.hash('12345', 10);
-  const passwordHash = await bcrypt.hash('admin123', 10);
+  await prisma.costAllocation.deleteMany();
+  await prisma.importedProduct.deleteMany();
+  await prisma.cost.deleteMany();
+  await prisma.logisticsData.deleteMany();
+  await prisma.import.deleteMany();
+  await prisma.supplier.deleteMany();
+  await prisma.productCatalog.deleteMany();
+  await prisma.permission.deleteMany();
+  await prisma.user.deleteMany();
 
-  const genericAdmin = await prisma.user.upsert({
-    where: { email: 'admin@admin.com' },
-    update: {},
-    create: {
-      email: 'admin@admin.com',
-      passwordHash: genericAdminPasswordHash,
-      name: 'Admin Genérico',
+  console.log('✅ Base de datos vaciada');
+
+  console.log('🌱 Creando admins...');
+
+  const hash1 = await bcrypt.hash('70111118LP', 10);
+  const hash2 = await bcrypt.hash('Mimi2705', 10);
+  const hash3 = await bcrypt.hash('12345', 10);
+
+  const admin1 = await prisma.user.create({
+    data: {
+      email: 'ghumerez@gmail.com',
+      passwordHash: hash1,
+      name: 'G Humerez',
       role: 'admin',
       status: 'approved',
       isActive: true
     }
   });
 
-  console.log('✅ Admin genérico creado:', genericAdmin.email);
+  console.log('✅ Admin creado:', admin1.email);
 
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@cdi.com' },
-    update: {},
-    create: {
-      email: 'admin@cdi.com',
-      passwordHash,
-      name: 'Administrador',
+  const admin2 = await prisma.user.create({
+    data: {
+      email: 'nahomihumerez.4s@gmail.com',
+      passwordHash: hash2,
+      name: 'Nahomi Humerez',
       role: 'admin',
       status: 'approved',
       isActive: true
     }
   });
 
-  console.log('✅ Usuario admin creado:', admin.email);
+  console.log('✅ Admin creado:', admin2.email);
 
-  const supervisor = await prisma.user.upsert({
-    where: { email: 'supervisor@cdi.com' },
-    update: {},
-    create: {
-      email: 'supervisor@cdi.com',
-      passwordHash,
-      name: 'Supervisor Demo',
+  const supervisor = await prisma.user.create({
+    data: {
+      email: 'carlos@gmail.com',
+      passwordHash: hash3,
+      name: 'Carlos',
       role: 'supervisor',
       status: 'approved',
       isActive: true
     }
   });
 
-  console.log('✅ Usuario supervisor creado:', supervisor.email);
-
-  const operator = await prisma.user.upsert({
-    where: { email: 'operator@cdi.com' },
-    update: {},
-    create: {
-      email: 'operator@cdi.com',
-      passwordHash,
-      name: 'Operador Demo',
-      role: 'operator',
-      status: 'approved',
-      isActive: true
-    }
-  });
-
-  console.log('✅ Usuario operador creado:', operator.email);
-
-  const reader = await prisma.user.upsert({
-    where: { email: 'reader@cdi.com' },
-    update: {},
-    create: {
-      email: 'reader@cdi.com',
-      passwordHash,
-      name: 'Lector Demo',
-      role: 'reader',
-      status: 'approved',
-      isActive: true
-    }
-  });
-
-  console.log('✅ Usuario lector creado:', reader.email);
-
-  console.log('\n📋 Credenciales de prueba:');
-  console.log('   admin@admin.com / 12345');
-  console.log('   admin@cdi.com / admin123');
-  console.log('   supervisor@cdi.com / admin123');
-  console.log('   operator@cdi.com / admin123');
-  console.log('   reader@cdi.com / admin123');
+  console.log('✅ Supervisor creado:', supervisor.email);
 
   await prisma.permission.createMany({
-    skipDuplicates: true,
     data: [
       { role: 'admin', resource: 'imports', canCreate: true, canRead: true, canUpdate: true, canDelete: true },
       { role: 'admin', resource: 'products', canCreate: true, canRead: true, canUpdate: true, canDelete: true },
@@ -102,20 +73,11 @@ async function main() {
       { role: 'supervisor', resource: 'imports', canCreate: true, canRead: true, canUpdate: true, canDelete: true },
       { role: 'supervisor', resource: 'products', canCreate: true, canRead: true, canUpdate: true, canDelete: true },
       { role: 'supervisor', resource: 'costs', canCreate: true, canRead: true, canUpdate: true, canDelete: true },
-      { role: 'supervisor', resource: 'catalog', canCreate: true, canRead: true, canUpdate: true, canDelete: false },
-      { role: 'operator', resource: 'imports', canCreate: true, canRead: true, canUpdate: true, canDelete: false },
-      { role: 'operator', resource: 'products', canCreate: true, canRead: true, canUpdate: true, canDelete: false },
-      { role: 'operator', resource: 'costs', canCreate: true, canRead: true, canUpdate: true, canDelete: false },
-      { role: 'operator', resource: 'catalog', canCreate: false, canRead: true, canUpdate: false, canDelete: false },
-      { role: 'reader', resource: 'imports', canCreate: false, canRead: true, canUpdate: false, canDelete: false },
-      { role: 'reader', resource: 'products', canCreate: false, canRead: true, canUpdate: false, canDelete: false },
-      { role: 'reader', resource: 'costs', canCreate: false, canRead: true, canUpdate: false, canDelete: false },
-      { role: 'reader', resource: 'catalog', canCreate: false, canRead: true, canUpdate: false, canDelete: false }
+      { role: 'supervisor', resource: 'catalog', canCreate: true, canRead: true, canUpdate: true, canDelete: false }
     ]
   });
 
   console.log('✅ Permisos creados');
-
   console.log('\n🎉 Seed completado exitosamente');
 }
 

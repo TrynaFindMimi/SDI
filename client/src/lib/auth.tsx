@@ -6,6 +6,7 @@ interface AuthContextType {
   token: string | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  updateProfile: (data: { name?: string; email?: string; password?: string }) => Promise<void>;
   isAdmin: boolean;
 }
 
@@ -56,8 +57,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('logicost-token');
   };
 
+  const updateProfile = async (data: { name?: string; email?: string; password?: string }) => {
+    const currentToken = token || localStorage.getItem('logicost-token');
+    if (!currentToken || !user) throw new Error('No autorizado');
+
+    const res = await fetch(`${API}/users/me`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${currentToken}`
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!res.ok) {
+      const result = await res.json().catch(() => ({}));
+      throw new Error(result.error?.message || 'Error al actualizar perfil');
+    }
+
+    const result = await res.json();
+    const serverUser = result.data;
+
+    const mappedUser: User = {
+      id: serverUser.id,
+      name: serverUser.name,
+      email: serverUser.email,
+      role: serverUser.role === 'admin' ? 'admin' : 'user',
+      createdAt: serverUser.createdAt || user.createdAt
+    };
+
+    setUser(mappedUser);
+    localStorage.setItem('logicost-user', JSON.stringify(mappedUser));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isAdmin: user?.role === 'admin' }}>
+    <AuthContext.Provider value={{ user, token, login, logout, updateProfile, isAdmin: user?.role === 'admin' }}>
       {children}
     </AuthContext.Provider>
   );

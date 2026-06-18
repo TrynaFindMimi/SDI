@@ -52,6 +52,7 @@ router.get('/auth/me', authMiddleware, authController.me);
 // Users (admin only)
 router.get('/users', authMiddleware, requireRole('admin'), authController.getAll);
 router.post('/users', authMiddleware, requireRole('admin'), authController.create);
+router.put('/users/me', authMiddleware, authController.updateProfile);
 router.put('/users/:id', authMiddleware, requireRole('admin'), authController.update);
 router.patch('/users/:id/approve', authMiddleware, requireRole('admin'), authController.approveUser);
 router.patch('/users/:id/reject', authMiddleware, requireRole('admin'), authController.rejectUser);

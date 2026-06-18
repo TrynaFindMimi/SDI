@@ -12,6 +12,7 @@ import { ReportsTab } from '../components/tabs/ReportsTab';
 import { TimelineTab } from '../components/tabs/TimelineTab';
 import { PrintTab } from '../components/tabs/PrintTab';
 import { UsersTab } from '../components/tabs/UsersTab';
+import { ProfileTab } from '../components/tabs/ProfileTab';
 import { Button } from '../components/ui';
 
 export function Dashboard() {
@@ -84,6 +85,7 @@ export function Dashboard() {
         {activeTab === 'timeline' && <TimelineTab />}
         {activeTab === 'print' && <PrintTab activeFolderId={activeFolderId} />}
         {activeTab === 'users' && <UsersTab />}
+        {activeTab === 'profile' && <ProfileTab />}
       </main>
     </div>
   );
